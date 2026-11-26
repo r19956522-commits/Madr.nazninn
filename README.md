@@ -20,7 +20,7 @@
     direction:rtl;
   }
 
-  /* ---------- گلبرگ‌های در حال ریزش ---------- */
+  /* ---------- گلبرگ‌های در حال ریزش (پس‌زمینه زنده) ---------- */
   .petals{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
   .petal{
     position:absolute;top:-12%;
@@ -33,33 +33,74 @@
     100%{transform:translateY(112vh) rotate(360deg)}
   }
 
-  /* ---------- صحنه و پاکت ---------- */
-  .stage{position:relative;z-index:2;perspective:1200px;display:grid;place-items:center}
+  /* ---------- استیج‌ها (عکس، پاکت، نامه) ---------- */
+  .stage{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;transition:opacity 0.8s ease, transform 0.8s ease;}
+  .stage.hidden{opacity:0;pointer-events:none;transform:scale(0.9);}
+  .stage.active{opacity:1;pointer-events:auto;transform:scale(1);}
 
+  /* ---------- بخش عکس ---------- */
+  .photo-frame {
+    background: #fff;
+    padding: 12px 12px 20px 12px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(150,20,60,0.3), 0 0 0 2px rgba(255,255,255,0.5) inset;
+    max-width: 90vw;
+    width: 350px;
+    text-align: center;
+    position: relative;
+  }
+  .photo-frame img {
+    width: 100%;
+    height: auto;
+    max-height: 55vh;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .heart-btn {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: none;
+    border: none;
+    font-size: 55px;
+    cursor: pointer;
+    filter: drop-shadow(0 5px 15px rgba(200,30,70,0.6));
+    animation: heartBeat 1.5s infinite;
+    transition: transform 0.2s;
+  }
+  .heart-btn:hover { transform: translateX(-50%) scale(1.1); }
+  @keyframes heartBeat {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.15); }
+  }
+  .hint-text {
+    margin-top: 40px;
+    font-size: 0.9rem;
+    color: #a8325a;
+    font-weight: 600;
+    animation: hintBlink 1.8s ease-in-out infinite;
+  }
+  @keyframes hintBlink{0%,100%{opacity:.6}50%{opacity:1}}
+
+  /* ---------- بخش پاکت ---------- */
+  .envelope-container { perspective: 1200px; display: grid; place-items: center; position: relative; }
   .envelope{
     position:relative;
     width:min(78vw,330px);
     aspect-ratio:330/215;
     border-radius:14px;
     background:linear-gradient(150deg,#ff92aa 0%,#ee4a70 55%,#d42753 100%);
-    box-shadow:0 25px 50px -12px rgba(190,30,70,.55),
-               inset 0 2px 0 rgba(255,255,255,.4);
+    box-shadow:0 25px 50px -12px rgba(190,30,70,.55), inset 0 2px 0 rgba(255,255,255,.4);
     cursor:pointer;
-    animation:breathe 2.6s ease-in-out infinite;
     transition:transform .9s cubic-bezier(.4,0,.2,1), opacity .9s;
   }
-  @keyframes breathe{
-    0%,100%{transform:scale(1)}
-    50%{transform:scale(1.04)}
-  }
-  .envelope.opened{
-    animation:none;
+  .envelope.opened {
     transform:scale(.7) translateY(16vh);
     opacity:.22;
     pointer-events:none;
   }
-
-  /* برگه‌ی سفید داخل پاکت */
   .peek{
     position:absolute;left:6%;right:6%;top:14%;height:72%;
     background:linear-gradient(180deg,#fffdf9,#fff3f6);
@@ -69,8 +110,6 @@
     transition:transform .8s cubic-bezier(.2,1,.3,1);
   }
   .envelope.opened .peek{transform:translateY(-58%)}
-
-  /* جیب جلوی پاکت */
   .pocket{
     position:absolute;inset:0;
     border-radius:14px;
@@ -79,8 +118,6 @@
     z-index:3;
     box-shadow:inset 0 -6px 14px rgba(0,0,0,.15);
   }
-
-  /* درِ بالای پاکت */
   .flap{
     position:absolute;left:0;right:0;top:0;height:64%;
     background:linear-gradient(180deg,#ffa3b6 0%,#f0567c 70%,#e23e67 100%);
@@ -90,12 +127,7 @@
     transition:transform .85s cubic-bezier(.5,-0.25,.4,1.4), z-index 0s .45s;
     z-index:4;
   }
-  .envelope.opened .flap{
-    transform:rotateX(-180deg);
-    z-index:0;
-  }
-
-  /* مهر قلب */
+  .envelope.opened .flap{ transform:rotateX(-180deg); z-index:0; }
   .seal{
     position:absolute;left:50%;top:52%;
     transform:translate(-50%,-50%);
@@ -103,32 +135,13 @@
     background:radial-gradient(circle at 34% 28%,#ff7d99,#c81e4a 70%);
     display:grid;place-items:center;
     font-size:26px;color:#fff;
-    box-shadow:0 10px 22px rgba(160,10,50,.55),
-               inset 0 -4px 10px rgba(0,0,0,.22),
-               0 0 0 4px rgba(255,255,255,.5);
+    box-shadow:0 10px 22px rgba(160,10,50,.55), inset 0 -4px 10px rgba(0,0,0,.22), 0 0 0 4px rgba(255,255,255,.5);
     z-index:5;
     animation:sealPulse 1.7s ease-in-out infinite;
     transition:transform .45s, opacity .45s;
   }
-  @keyframes sealPulse{
-    0%,100%{transform:translate(-50%,-50%) scale(1)}
-    50%{transform:translate(-50%,-50%) scale(1.12)}
-  }
-  .envelope.opened .seal{
-    opacity:0;
-    transform:translate(-50%,-50%) scale(0) rotate(90deg);
-    animation:none;
-  }
-
-  /* راهنما */
-  .hint{
-    position:absolute;bottom:-58px;left:50%;transform:translateX(-50%);
-    margin:0;white-space:nowrap;
-    font-size:.85rem;color:#a8325a;font-weight:600;
-    transition:opacity .45s;
-    animation:hintBlink 1.8s ease-in-out infinite;
-  }
-  @keyframes hintBlink{0%,100%{opacity:.55}50%{opacity:1}}
+  @keyframes sealPulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.12)}}
+  .envelope.opened .seal{ opacity:0; transform:translate(-50%,-50%) scale(0) rotate(90deg); animation:none;}
 
   /* ---------- کارت نامه ---------- */
   .letter-card{
@@ -137,9 +150,7 @@
     padding:30px 24px 26px;
     border-radius:20px;
     background:linear-gradient(160deg,#fffdfb 0%,#fff2f5 55%,#ffe4ec 100%);
-    box-shadow:0 35px 70px -18px rgba(150,20,60,.55),
-               0 0 0 1px rgba(255,255,255,.9) inset,
-               0 0 0 7px rgba(255,255,255,.55);
+    box-shadow:0 35px 70px -18px rgba(150,20,60,.55), 0 0 0 1px rgba(255,255,255,.9) inset, 0 0 0 7px rgba(255,255,255,.55);
     border-top:7px solid #e8355c;
     text-align:center;
     transform:translate(-50%,-50%) scale(.04) rotate(-10deg);
@@ -152,80 +163,38 @@
   .letter-card.show{
     transform:translate(-50%,-50%) scale(1) rotate(0deg);
     opacity:1;
+    pointer-events:auto;
   }
-
-  .letter-card h1{
-    margin:4px 0 16px;
-    font-size:1.05rem;
-    font-weight:800;
-    color:#c81e4a;
-    letter-spacing:.4px;
-  }
-  .letter-card p{
-    margin:0 0 11px;
-    font-size:clamp(.82rem, 2.4vw + .42rem, .96rem);
-    line-height:2.05;
-    color:#4a2430;
-    text-align:justify;
-    text-align-last:center;
-  }
-  .signature{
-    margin-top:18px;
-    padding-top:14px;
-    border-top:1px dashed #f0b8c6;
-    font-weight:800;
-    font-size:1rem;
-    color:#c81e4a;
-  }
-  .signature small{
-    display:block;margin-top:5px;
-    font-weight:400;font-size:.72rem;color:#a0687a;
-  }
+  .letter-card h1{margin:4px 0 16px; font-size:1.05rem; font-weight:800; color:#c81e4a;}
+  .letter-card p{margin:0 0 11px; font-size:clamp(.82rem, 2.4vw + .42rem, .96rem); line-height:2.05; color:#4a2430; text-align:justify; text-align-last:center;}
+  .signature{margin-top:18px; padding-top:14px; border-top:1px dashed #f0b8c6; font-weight:800; font-size:1rem; color:#c81e4a;}
+  .signature small{display:block; margin-top:5px; font-weight:400; font-size:.72rem; color:#a0687a;}
 
   /* ظهور پله‌ای متن */
   .fade{opacity:0;transform:translateY(14px)}
-  .letter-card.show .fade{
-    animation:fadeUp .8s cubic-bezier(.2,.9,.3,1) forwards;
-    animation-delay:var(--d,0s);
-  }
+  .letter-card.show .fade{animation:fadeUp .8s cubic-bezier(.2,.9,.3,1) forwards; animation-delay:var(--d,0s);}
   @keyframes fadeUp{to{opacity:1;transform:none}}
 
   /* ---------- دسته‌های رز ---------- */
   .roses{position:absolute;width:80px;height:82px;pointer-events:none;z-index:2}
   .roses-tr{top:-20px;right:-16px}
   .roses-tl{top:-20px;left:-16px}
-
-  .roses-bottom{
-    bottom:-34px;left:50%;transform:translateX(-50%);
-    display:flex;align-items:flex-end;gap:1px;
-    width:auto;height:auto;
-  }
+  .roses-bottom{bottom:-34px;left:50%;transform:translateX(-50%);display:flex;align-items:flex-end;gap:1px;width:auto;height:auto;}
   .roses-bottom .rose{position:static!important;display:inline-block}
-
   .rose{
-    position:absolute;
-    opacity:0;
-    transform:scale(0) rotate(-45deg);
-    filter:drop-shadow(0 4px 5px rgba(150,0,40,.3));
+    position:absolute;opacity:0;transform:scale(0) rotate(-45deg);filter:drop-shadow(0 4px 5px rgba(150,0,40,.3));
   }
   .letter-card.show .rose{
-    animation:rosePop .65s cubic-bezier(.2,1.7,.4,1) forwards,
-              roseFloat 3.2s ease-in-out infinite 1.4s;
+    animation:rosePop .65s cubic-bezier(.2,1.7,.4,1) forwards, roseFloat 3.2s ease-in-out infinite 1.4s;
     animation-delay:var(--d,.6s), 1.4s;
   }
-  @keyframes rosePop{
-    0%{opacity:0;transform:scale(0) rotate(-45deg)}
-    65%{opacity:1;transform:scale(1.28) rotate(10deg)}
-    100%{opacity:1;transform:scale(1) rotate(0deg)}
-  }
-  @keyframes roseFloat{
-    0%,100%{transform:translateY(0) rotate(0deg)}
-    50%{transform:translateY(-5px) rotate(4deg)}
-  }
+  @keyframes rosePop{0%{opacity:0;transform:scale(0) rotate(-45deg)}65%{opacity:1;transform:scale(1.28) rotate(10deg)}100%{opacity:1;transform:scale(1) rotate(0deg)}}
+  @keyframes roseFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-5px) rotate(4deg)}}
 
   @media (max-width:400px){
     .roses{width:64px;height:70px}
     .letter-card{padding:26px 18px 22px}
+    .photo-frame { width: 85vw; }
   }
 </style>
 </head>
@@ -234,29 +203,36 @@
   <!-- گلبرگ‌های پس‌زمینه -->
   <div class="petals" id="petals"></div>
 
-  <!-- پاکت نامه -->
-  <div class="stage">
-    <div class="envelope" id="envelope">
-      <div class="peek"></div>
-      <div class="pocket"></div>
-      <div class="flap"></div>
-      <div class="seal">❤</div>
+  <!-- استیج ۱: عکس -->
+  <div class="stage active" id="photo-stage">
+    <div class="photo-frame">
+      <!-- نام عکس شما باید photo.jpg باشد -->
+      <img src="photo.jpg" alt="مامان عزیزم" onerror="this.src='https://images.unsplash.com/photo-1549465220-1a8b9238cd48?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';">
     </div>
-    <p class="hint" id="hint">روی قلب نامه بزن 💌</p>
+    <button class="heart-btn" id="start-btn">❤️</button>
+    <p class="hint-text">برای باز کردن نامه، روی قلب بزن</p>
   </div>
 
-  <!-- نامه -->
-  <div class="letter-card" id="card">
+  <!-- استیج ۲: پاکت -->
+  <div class="stage hidden" id="envelope-stage">
+    <div class="envelope-container">
+      <div class="envelope" id="envelope">
+        <div class="peek"></div>
+        <div class="pocket"></div>
+        <div class="flap"></div>
+        <div class="seal">❤</div>
+      </div>
+    </div>
+  </div>
 
-    <!-- دسته رز گوشه راست -->
+  <!-- استیج ۳: نامه -->
+  <div class="letter-card" id="card">
     <div class="roses roses-tr">
       <span class="rose" style="--d:.55s;left:0;top:28px;font-size:24px">🌹</span>
       <span class="rose" style="--d:.65s;left:22px;top:6px;font-size:31px">🌹</span>
       <span class="rose" style="--d:.75s;left:52px;top:30px;font-size:20px">🌹</span>
       <span class="rose" style="--d:.85s;left:30px;top:42px;font-size:17px">🍃</span>
     </div>
-
-    <!-- دسته رز گوشه چپ -->
     <div class="roses roses-tl">
       <span class="rose" style="--d:.6s;left:30px;top:28px;font-size:24px">🌹</span>
       <span class="rose" style="--d:.7s;left:8px;top:6px;font-size:31px">🌹</span>
@@ -265,31 +241,16 @@
     </div>
 
     <h1 class="fade" style="--d:.18s">تقدیم به مهربان‌ترین مادرم</h1>
-
-    <p class="fade" style="--d:.34s">
-      مامان جانم، روز مادر مبارک. دورم، ولی دلم پیش توست.
-    </p>
-
-    <p class="fade" style="--d:.52s">
-      تو منبع انرژی بی‌پایان زندگی منی؛ جریان محبتت هیچ‌وقت قطع نشد
-      و فرکانس دعاهات همیشه با قلبم هم‌فاز بود.
-    </p>
-
-    <p class="fade" style="--d:.70s">
-      دوره تناوب این دوری طولانی است، اما هر سیکل زندگی‌ام با یاد تو شروع می‌شه.
-    </p>
-
-    <p class="fade" style="--d:.88s">
-      از همین راه دور دستت رو می‌بوسم و قول می‌دم با درس‌خوندنم باعث افتخارت بشم.
-      خیلی دوستت دارم.
-    </p>
-
+    <p class="fade" style="--d:.34s">مامان جانم، روز مادر مبارک. دورم، ولی دلم پیش توست.</p>
+    <p class="fade" style="--d:.52s">تو منبع انرژی بی‌پایان زندگی منی؛ جریان محبتت هیچ‌وقت قطع نشد و فرکانس دعاهات همیشه با قلبم هم‌فاز بود.</p>
+    <p class="fade" style="--d:.70s">دوره تناوب این دوری طولانی است، اما هر سیکل زندگی‌ام با یاد تو شروع می‌شه.</p>
+    <p class="fade" style="--d:.88s">از همین راه دور دستت رو می‌بوسم و قول می‌دم با درس‌خوندنم باعث افتخارت بشم. خیلی دوستت دارم.</p>
+    
     <div class="signature fade" style="--d:1.1s">
       محمدرسول یزدیان بگ گراند
       <small>دانشجوی برق — از راه دور، با تمام دل</small>
     </div>
 
-    <!-- دسته رز پایین نامه -->
     <div class="roses roses-bottom">
       <span class="rose" style="--d:1.0s;font-size:24px">🌹</span>
       <span class="rose" style="--d:1.1s;font-size:31px">🌹</span>
@@ -315,27 +276,40 @@
     petalBox.appendChild(p);
   }
 
-  /* --- باز شدن نامه --- */
+  /* --- منطق کلیک کردن --- */
+  const photoStage = document.getElementById('photo-stage');
+  const envelopeStage = document.getElementById('envelope-stage');
+  const startBtn = document.getElementById('start-btn');
   const envelope = document.getElementById('envelope');
-  const hint = document.getElementById('hint');
   const card = document.getElementById('card');
-  let opened = false;
+  
+  let envelopeOpened = false;
 
+  // 1. کلیک روی قلب در عکس
+  startBtn.addEventListener('click', () => {
+    photoStage.classList.remove('active');
+    photoStage.classList.add('hidden');
+    
+    setTimeout(() => {
+      envelopeStage.classList.remove('hidden');
+      envelopeStage.classList.add('active');
+    }, 600); // منتظر می‌مانیم تا عکس محو شود
+  });
+
+  // 2. کلیک روی پاکت برای باز شدن
   function openLetter() {
-    if (opened) return;
-    opened = true;
+    if (envelopeOpened) return;
+    envelopeOpened = true;
 
-    hint.style.opacity = '0';
     envelope.classList.add('opened');
 
-    /* بعد از باز شدن درِ پاکت، نامه بیرون می‌آید */
-    setTimeout(() => card.classList.add('show'), 600);
+    // بعد از باز شدن درِ پاکت، نامه بیرون می‌آید
+    setTimeout(() => {
+      card.classList.add('show');
+    }, 600);
   }
 
   envelope.addEventListener('click', openLetter);
-  envelope.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') openLetter();
-  });
 </script>
 </body>
 </html>
